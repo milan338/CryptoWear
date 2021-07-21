@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<res xmlns="http://tizen.org/ns/rm">
+    <group-image folder="contents"/>
+    <group-layout folder="contents"/>
+    <group-sound folder="contents"/>
+    <group-bin folder="contents"/>
+</res>

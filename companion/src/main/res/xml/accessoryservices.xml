@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <application name="CryptoWearCompanion" />
+    <serviceProfile name="keys" id="/com/milan338/cryptowear" role="provider" serviceImpl="com.milan338.cryptowearcompanion.AccessoryProvider" serviceLimit="ANY" serviceTimeout="10" version="1.0">
+        <suppportedTransports>
+            <transport type="TRANSPORT_BT" />
+            <transport type="TRANSPORT_WIFI" />
+        </suppportedTransports>
+        <serviceChannel dataRate="low" id="169" priority="low" reliability="enable" />
+    </serviceProfile>
+</resources>

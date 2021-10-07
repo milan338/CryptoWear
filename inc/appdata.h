@@ -1,9 +1,9 @@
 #ifndef APPDATA_H
 #define APPDATA_H
 
-#include "main.h"
-#include <cairo.h>
 #include <bundle.h>
+#include <cairo.h>
+#include "main.h"
 
 typedef struct appdata
 {
@@ -11,6 +11,7 @@ typedef struct appdata
     char currency[4];
     char data_provider[20];
     char *current_exchange;
+    char *proxy_addr;
     int width;
     int height;
     bool win_lower;

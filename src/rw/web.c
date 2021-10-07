@@ -1,8 +1,9 @@
-#include <curl/curl.h>
-#include <net_connection.h>
+#include "web.h"
+#include "../net/network.h"
 #include "file.h"
 #include "json.h"
-#include "web.h"
+#include <curl/curl.h>
+#include <net_connection.h>
 
 static size_t write_memory_callback(void *contents, size_t size, size_t nmemb, void *userp)
 {
@@ -22,6 +23,7 @@ static size_t write_memory_callback(void *contents, size_t size, size_t nmemb, v
 // Set common curl_easy_setopt options
 static void web_request_curl_easy_setopts(CURL *curl_handler, char *url, char *post_data, struct curl_slist *http_headers, request_type_e request_type)
 {
+    appdata_s *ad = get_appdata(NULL);
     switch (request_type)
     {
     case REQUEST_TYPE_NONE:
@@ -41,19 +43,20 @@ static void web_request_curl_easy_setopts(CURL *curl_handler, char *url, char *p
         curl_easy_setopt(curl_handler, CURLOPT_POSTFIELDS, post_data);
     if (http_headers != NULL)
         curl_easy_setopt(curl_handler, CURLOPT_HTTPHEADER, http_headers);
+    if (ad->proxy_addr != NULL)
+        curl_easy_setopt(curl_handler, CURLOPT_PROXY, ad->proxy_addr);
 }
 
 // Send an http request and save response in memory, must be cleaned up afterwards using web_request_cleanup
 MemoryStruct *web_request_write_memory(char *url, char *post_data, struct curl_slist *http_headers, request_type_e request_type)
 {
-    connection_h connection;
     MemoryStruct *chunk = NULL;
     CURL *curl_handler = NULL;
     curl_handler = curl_easy_init();
     // No errors
     if (curl_handler)
     {
-        int conn_err = connection_create(&connection);
+        int conn_err = create_new_connection();
         if (conn_err == CONNECTION_ERROR_NONE)
         {
             // Chunk memory be grown as needed by realloc
@@ -74,7 +77,7 @@ MemoryStruct *web_request_write_memory(char *url, char *post_data, struct curl_s
                 chunk = NULL;
             }
         }
-        connection_destroy(connection);
+        destroy_existing_connection();
     }
     curl_easy_cleanup(curl_handler);
     return chunk;
@@ -84,13 +87,12 @@ MemoryStruct *web_request_write_memory(char *url, char *post_data, struct curl_s
 int web_request_write_file(char *url, char *post_data, struct curl_slist *http_headers, char *file_path, request_type_e request_type)
 {
     CURLcode curl_err = CURLE_OK;
-    connection_h connection = NULL;
     CURL *curl_handler = NULL;
     curl_handler = curl_easy_init();
     // No errors
     if (curl_handler)
     {
-        int conn_err = connection_create(&connection);
+        int conn_err = create_new_connection();
         if (conn_err == CONNECTION_ERROR_NONE)
         {
             // Init file for writing
@@ -106,7 +108,7 @@ int web_request_write_file(char *url, char *post_data, struct curl_slist *http_h
             if (curl_err != CURLE_OK)
                 remove(file_path);
         }
-        connection_destroy(connection);
+        destroy_existing_connection();
     }
     curl_easy_cleanup(curl_handler);
     return curl_err;

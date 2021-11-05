@@ -1,9 +1,11 @@
 # CryptoWear
 
 ![issues](https://img.shields.io/github/issues/milan338/CryptoWear?style=flat-square)
+![Release](https://img.shields.io/github/v/release/milan338/CryptoWear?include_prereleases&style=flat-square)
+![Downloads](https://img.shields.io/github/downloads/milan338/CryptoWear/total?style=flat-square)
 ![size](https://img.shields.io/github/repo-size/milan338/CryptoWear?style=flat-square)
 
-### ***Track your crypto portfolio from the comfort of your wrist***
+### ***Your crypto portfolio from the comfort of your wrist***
 
 ## Features
 
@@ -13,11 +15,18 @@
 - Summary pie-chart of your top assets
 - Browse the latest news for your coins
 
+## Supported Exchanges
+
+- Coinbase
+- CoinSpot
+
+Feel free to [submit a feature request](https://github.com/milan338/CryptoWear/issues/new/choose) if your exchange isn't yet supported.
+
 ## Usage
 
 *Before using this software, ensure your mobile device supports the Samsung Accessory Protocol* (required for syncing exchange API keys to your wearable).
 
-To connect to your exchange, first create a new **Read-Only** API key. Some exchanges like coinbase use a permissions system instead. For this, make sure you give the API key access to all accounts you wish to track, and **only** allow the **wallet : accounts : read** permission.
+To connect to your exchange, first create a new **Read-Only** API key. Some exchanges like Coinbase use a permissions system instead. For this, make sure you give the API key access to all accounts you wish to track, and **only** allow the **wallet : accounts : read** permission.
 
 Add your API key and its Secret Key to the companion app, then in your wearable in settings, select `sync keys`. Optionally, you can save these keys to your mobile device using the `save keys` button. Note, when syncing keys, any empty keys in the companion app will act to remove the associated keys from your wearable.
 
@@ -28,12 +37,6 @@ CryptoWear **does not** collect any data from users, and it **does not** employ 
 CryptoWear needs internet access to get your portfolio data, to collect coin price data, to download coin information, to fetch news data, and to display live price charts. Your private exchange API keys are only ever sent directly to your exchanges, and your secret keys are only ever used to sign API requests, never leaving your device.
 
 Your API keys are privately stored in [Tizen's secure keystore](https://developer.tizen.org/development/guides/native-application/security/secure-key-management) directly on your wearable, and are not stored anywhere else. You can also store these keys on your mobile device should you choose; even though these keys are stored in the [application's preferences storage](https://developer.android.com/training/data-storage/shared-preferences), if your device is rooted and you're worried about malicious access to these keys, you can always choose not to store them on your device. Keep in mind, without saving keys to your mobile device, updating one key will require re-inputting all other keys you wish to still use, since syncing empty keys will cause those keys to be removed from the wearable.
-
-## Supported Exchanges
-
-- Coinbase
-- CoinSpot
--
 
 ## Building it Yourself
 
@@ -66,3 +69,7 @@ The Tizen application must be signed using a Samsung mobile / wearable certifica
 Under the project settings, go to `Build Configurations > Set Active > Release`. Then simply run `Build Signed Project`.
 
 ## Media
+
+![1](/media/img_1.jpg)
+
+![2](/media/img_2.jpg) ![3](/media/img_3.jpg) ![4](/media/img_4.jpg)

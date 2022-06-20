@@ -1,0 +1,27 @@
+{
+    "configurations": [
+        {
+            "name": "Tizen Native Wearable 5.5",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "C:/tizen-studio/tools/llvm-10/lib/clang/10.0.0/include/**",
+                "C:/tizen-studio/platforms/tizen-5.5/wearable/rootstraps/**"
+            ],
+            "defines": [
+                "_DEBUG",
+                "UNICODE",
+                "_UNICODE",
+                "TIZEN_DEPRECATION",
+                "DEPRECATION_WARNING",
+                "_WINSOCK_H"
+            ],
+            "compilerArgs": ["--undefine-macro CURL_PULL_WS2TCPIP_H"],
+            "compilerPath": "C:/tizen-studio/tools/llvm-10/bin/clang.exe",
+            "intelliSenseMode": "linux-clang-arm",
+            "cStandard": "c99",
+            "cppStandard": "c++11",
+            "compileCommands": "${workspaceFolder}/Release/compile_commands.json"
+        }
+    ],
+    "version": 4
+}

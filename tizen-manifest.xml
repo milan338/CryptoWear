@@ -1,19 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<manifest xmlns="http://tizen.org/ns/packages"
-    api-version="5.5"
-    package="com.milan338.cryptowear"
-    version="1.0.0">
+<manifest xmlns="http://tizen.org/ns/packages" api-version="5.5" package="com.milan338.cryptowear" version="1.0.0">
     <profile name="wearable" />
-    <ui-application appid="com.milan338.cryptowear"
-        exec="cryptowear"
-        multiple="false"
-        nodisplay="false"
-        taskmanage="true"
-        type="capp">
+    <ui-application appid="com.milan338.cryptowear" exec="cryptowear" multiple="false" nodisplay="false" taskmanage="true" type="capp">
         <label>Crypto Wear</label>
         <icon>cryptowear.png</icon>
-        <metadata key="accessory-services-location"
-            value="/res/xml/accessoryservices.xml" />
+        <metadata key="accessory-services-location" value="/res/xml/accessoryservices.xml" />
     </ui-application>
     <privileges>
         <privilege>http://tizen.org/privilege/download</privilege>

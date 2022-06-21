@@ -209,7 +209,7 @@ char *unix_hours_ago(time_t then)
     double diff = difftime(now, then);
     double hh = diff / 3600.0;
     char *str;
-    if (hh < 1.0)
+    if (hh < 0.5)
         str = strdup("Just now");
     else
         str = new_string_printf("%.1f hours ago", hh);

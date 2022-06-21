@@ -73,6 +73,7 @@ static void view_data_news_loaded_cb(void *data, Ecore_Thread *thread)
     genlist_title_add(ad, title);
     for (size_t i = 0; i < news->size; i++)
         genlist_news_add(ad, news->news_arr[i], show_article_view, news->news_arr[i]);
+    genlist_padding_add(ad);
     // Cleanup on menu exit
     elm_naviframe_item_pop_cb_set(nf_it, (Elm_Naviframe_Item_Pop_Cb)view_data_news_pop_cb, NULL);
 }

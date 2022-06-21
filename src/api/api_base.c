@@ -20,10 +20,10 @@ static void download_crypto_icon_thread_cb(void *data, Ecore_Thread *thread)
     char *file_name = new_string_printf("%s.png", crypto);
     char *icon_path = appdata_get_shared_filepath(file_name);
     char *img_url = NULL;
-    eina_lock_take(&ad->icon_urls_mutex);
+    lock_take(&ad->icon_urls_mutex);
     bundle_get_str(ad->icon_urls, crypto, &img_url);
     char *url = new_string_printf("https://cryptocompare.com%s", img_url);
-    eina_lock_release(&ad->icon_urls_mutex);
+    lock_release(&ad->icon_urls_mutex);
     // File exists online
     int curl_err;
     if (img_url[0] == '/')
@@ -43,10 +43,10 @@ static void download_crypto_icon_thread_cb(void *data, Ecore_Thread *thread)
     // Update file status bundle
     gint *status = NULL;
     size_t status_size;
-    eina_lock_take(&ad->file_status_mutex);
+    lock_take(&ad->file_status_mutex);
     bundle_get_byte(ad->file_status, icon_path, (void **)&status, &status_size);
     *status = curl_err == CURLE_OK ? 1 : 0;
-    eina_lock_release(&ad->file_status_mutex);
+    lock_release(&ad->file_status_mutex);
     // Cleanup
     free(file_name);
     free(icon_path);

@@ -19,7 +19,7 @@ void update_file_status_bundle(char *path, int status)
     // Get flag
     gint *flag = NULL;
     size_t flag_size;
-    eina_lock_take(&ad->file_status_mutex);
+    lock_take(&ad->file_status_mutex);
     int ret = bundle_get_byte(ad->file_status, path, (void **)&flag, &flag_size);
     // Create new bundle entry if non-existent
     if (ret != BUNDLE_ERROR_NONE)
@@ -30,5 +30,5 @@ void update_file_status_bundle(char *path, int status)
     }
     else
         *flag = status;
-    eina_lock_release(&ad->file_status_mutex);
+    lock_release(&ad->file_status_mutex);
 }

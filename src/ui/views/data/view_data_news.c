@@ -53,14 +53,14 @@ static void view_data_news_loaded_cb(void *data, Ecore_Thread *thread)
     // Get news data array
     CoinNews *news = NULL;
     size_t size;
-    eina_lock_take(&ad->coin_news_mutex);
+    lock_take(&ad->coin_news_mutex);
     bundle_get_byte(ad->coin_news, symbol, (void **)&news, &size);
-    eina_lock_release(&ad->coin_news_mutex);
+    lock_release(&ad->coin_news_mutex);
     // Get crypto name
     char *name = NULL;
-    eina_lock_take(&ad->coin_list_mutex);
+    lock_take(&ad->coin_list_mutex);
     int err = bundle_get_str(ad->crypto_names, symbol, &name);
-    eina_lock_release(&ad->coin_list_mutex);
+    lock_release(&ad->coin_list_mutex);
     if (err != BUNDLE_ERROR_NONE)
         title = new_string_printf("%s News", symbol);
     else

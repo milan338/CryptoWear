@@ -103,12 +103,12 @@ static bool app_create(void *data)
     // Init SAP
     sap_init(ad);
     // Create new mutexes
-    eina_lock_new(&ad->file_status_mutex);
-    eina_lock_new(&ad->coin_list_mutex);
-    eina_lock_new(&ad->fiat_data_mutex);
-    eina_lock_new(&ad->coin_price_data_mutex);
-    eina_lock_new(&ad->coin_news_mutex);
-    eina_lock_new(&ad->icon_urls_mutex);
+    lock_new(&ad->file_status_mutex);
+    lock_new(&ad->coin_list_mutex);
+    lock_new(&ad->fiat_data_mutex);
+    lock_new(&ad->coin_price_data_mutex);
+    lock_new(&ad->coin_news_mutex);
+    lock_new(&ad->icon_urls_mutex);
     // Create bundles
     ad->exchange_data = bundle_create();
     ad->fiat_data = bundle_create();
@@ -180,12 +180,12 @@ static void app_terminate(void *data)
     // Cleanup curl
     curl_global_cleanup();
     // Cleanup mutexes
-    eina_lock_free(&ad->file_status_mutex);
-    eina_lock_free(&ad->coin_list_mutex);
-    eina_lock_free(&ad->fiat_data_mutex);
-    eina_lock_free(&ad->coin_price_data_mutex);
-    eina_lock_free(&ad->coin_news_mutex);
-    eina_lock_free(&ad->icon_urls_mutex);
+    lock_free(&ad->file_status_mutex);
+    lock_free(&ad->coin_list_mutex);
+    lock_free(&ad->fiat_data_mutex);
+    lock_free(&ad->coin_price_data_mutex);
+    lock_free(&ad->coin_news_mutex);
+    lock_free(&ad->icon_urls_mutex);
     // Cleanup SAP
     sap_shutdown();
     // Shutdown eina modules

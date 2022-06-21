@@ -65,9 +65,9 @@ static char *item_crypto_get_text(void *data, Evas_Object *obj, const char *part
     char *label = data;
     char *name = NULL;
     appdata_s *ad = get_appdata(NULL);
-    eina_lock_take(&ad->coin_list_mutex);
+    lock_take(&ad->coin_list_mutex);
     int err = bundle_get_str(ad->crypto_names, label, &name);
-    eina_lock_release(&ad->coin_list_mutex);
+    lock_release(&ad->coin_list_mutex);
     // Return crypto name if it exists, otherwise return the code
     if (!strcmp(part, "elm.text"))
     {
@@ -95,9 +95,9 @@ static char *item_fiat_get_text(void *data, Evas_Object *obj, const char *part)
     FiatData *fiat_data = NULL;
     size_t size;
     appdata_s *ad = get_appdata(NULL);
-    eina_lock_take(&ad->fiat_data_mutex);
+    lock_take(&ad->fiat_data_mutex);
     bundle_error_e err = bundle_get_byte(ad->fiat_data, label, (void **)&fiat_data, &size);
-    eina_lock_release(&ad->fiat_data_mutex);
+    lock_release(&ad->fiat_data_mutex);
     // Return fiat name if it exists, otherwise return the code
     if (!strcmp(part, "elm.text"))
     {
@@ -123,7 +123,7 @@ static char *item_news_get_text(void *data, Evas_Object *obj, const char *part)
 {
     appdata_s *ad = get_appdata(NULL);
     char *ret = NULL;
-    eina_lock_take(&ad->coin_news_mutex);
+    lock_take(&ad->coin_news_mutex);
     CoinNewsData *news = data;
     if (!strcmp(part, "elm.text"))
         ret = strdup(news->title);
@@ -131,7 +131,7 @@ static char *item_news_get_text(void *data, Evas_Object *obj, const char *part)
         ret = strdup(news->source);
     else if (!strcmp(part, "elm.text.2"))
         ret = unix_hours_ago(news->published_on);
-    eina_lock_release(&ad->coin_news_mutex);
+    lock_release(&ad->coin_news_mutex);
     return ret;
 }
 
@@ -174,10 +174,10 @@ static Evas_Object *item_crypto_get_content(void *data, Evas_Object *obj, const 
         size_t status_size;
         // Get file availability status
         int file_exists = 0;
-        eina_lock_take(&ad->file_status_mutex);
+        lock_take(&ad->file_status_mutex);
         bundle_get_byte(ad->file_status, icon_path, (void **)&status, &status_size);
         file_exists = *status;
-        eina_lock_release(&ad->file_status_mutex);
+        lock_release(&ad->file_status_mutex);
         if (file_exists)
             ret = elm_image_file_set(icon, icon_path, NULL);
         else

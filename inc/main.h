@@ -13,6 +13,7 @@
 
 #include "util.h"
 #include "appdata.h"
+#include "../src/thread/lock.h"
 
 #ifdef LOG_TAG
 #undef LOG_TAG

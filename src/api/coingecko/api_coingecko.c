@@ -35,9 +35,9 @@ static void api_coingecko_coin_list_parse_json(appdata_s *ad, MemoryStruct *data
     JsonNode *json_root = json_parser_get_root(json_parser);
     JsonArray *root_array = json_node_get_array(json_root);
     // Load data from array members
-    eina_lock_take(&ad->coin_list_mutex);
+    lock_take(&ad->coin_list_mutex);
     json_array_foreach_element(root_array, api_coingecko_coin_list_parse_json_array_cb, ad->crypto_names);
-    eina_lock_release(&ad->coin_list_mutex);
+    lock_release(&ad->coin_list_mutex);
     // Cleanup
     g_error_free(err);
     g_object_unref(json_parser);
@@ -46,12 +46,12 @@ static void api_coingecko_coin_list_parse_json(appdata_s *ad, MemoryStruct *data
 // Get a list of crypto symbols and their full names and cache it to a local json file
 void api_coingecko_coin_list(appdata_s *ad)
 {
-    eina_lock_take(&ad->coin_list_mutex);
+    lock_take(&ad->coin_list_mutex);
     // Init bundle for storing json data
     if (ad->crypto_names != NULL)
         bundle_free(ad->crypto_names);
     ad->crypto_names = bundle_create();
-    eina_lock_release(&ad->coin_list_mutex);
+    lock_release(&ad->coin_list_mutex);
     // send api request
     MemoryStruct *chunk = web_request_write_memory(API_COINGECKO_COIN_LIST, NULL, NULL, REQUEST_TYPE_GET);
     // Request success

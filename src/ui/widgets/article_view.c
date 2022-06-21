@@ -20,7 +20,7 @@ void show_article_view(CoinNewsData *news)
     appdata_s *ad = get_appdata(NULL);
     // Generate new HTML string into memory
     article_html = NULL;
-    eina_lock_take(&ad->coin_news_mutex);
+    lock_take(&ad->coin_news_mutex);
     article_published_on = unix_time_fmt(news->published_on);
     article_html = new_string_printf(article_html_template,
                                      news->title,
@@ -28,7 +28,7 @@ void show_article_view(CoinNewsData *news)
                                      article_published_on,
                                      news->body,
                                      news->url);
-    eina_lock_release(&ad->coin_news_mutex);
+    lock_release(&ad->coin_news_mutex);
     // Create webview
     Evas *evas = evas_object_evas_get(ad->naviframe);
     ad->web_view = ewk_view_add(evas);

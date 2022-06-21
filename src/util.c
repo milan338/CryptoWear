@@ -179,9 +179,9 @@ char *fiat_symbol()
     // Get currency symbol
     FiatData *fiat_data = NULL;
     size_t size;
-    eina_lock_take(&ad->fiat_data_mutex);
+    lock_take(&ad->fiat_data_mutex);
     bundle_get_byte(ad->fiat_data, ad->currency, (void **)&fiat_data, &size);
-    eina_lock_release(&ad->fiat_data_mutex);
+    lock_release(&ad->fiat_data_mutex);
     // Return pointer to symbol - must not be freed
     return fiat_data->symbol;
 }

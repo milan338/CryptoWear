@@ -37,10 +37,10 @@ void view_data_main(int i)
     cairo_show_text(ad->cairo, line);
     free(line);
     // Draw crypto text
-    eina_lock_take(&ad->coin_list_mutex);
+    lock_take(&ad->coin_list_mutex);
     // Line is returned from bundle, don't free
     bundle_get_str(ad->crypto_names, ad->coin_data[i].symbol, &line);
-    eina_lock_release(&ad->coin_list_mutex);
+    lock_release(&ad->coin_list_mutex);
     cairo_text_extents(ad->cairo, line, &extents);
     cairo_move_to(ad->cairo,
                   x - ((extents.width / 2.0) + extents.x_bearing),

@@ -3,6 +3,7 @@
 
 #include <bundle.h>
 #include <cairo.h>
+#include "../src/thread/lock.h"
 #include "main.h"
 
 typedef struct appdata
@@ -56,12 +57,12 @@ typedef struct appdata
     bundle *icon_urls;
     bundle *file_status;
     Eina_Strbuf *crypto_to_convert;
-    Eina_Lock file_status_mutex;
-    Eina_Lock coin_list_mutex;
-    Eina_Lock fiat_data_mutex;
-    Eina_Lock coin_price_data_mutex;
-    Eina_Lock coin_news_mutex;
-    Eina_Lock icon_urls_mutex;
+    Lock file_status_mutex;
+    Lock coin_list_mutex;
+    Lock fiat_data_mutex;
+    Lock coin_price_data_mutex;
+    Lock coin_news_mutex;
+    Lock icon_urls_mutex;
 } appdata_s;
 
 #endif // APPDATA_H

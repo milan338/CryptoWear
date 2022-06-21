@@ -43,9 +43,9 @@ void api_fiat(appdata_s *ad)
     char *file_path = NULL;
     app_resource_manager_get(APP_RESOURCE_TYPE_BIN, "data/currency_data.json", &file_path);
     // Parse json from file
-    eina_lock_take(&ad->fiat_data_mutex);
+    lock_take(&ad->fiat_data_mutex);
     api_fiat_parse_json(ad, file_path);
-    eina_lock_release(&ad->fiat_data_mutex);
+    lock_release(&ad->fiat_data_mutex);
     // Cleanup
     free(file_path);
 }

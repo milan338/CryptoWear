@@ -37,11 +37,11 @@ static void api_cryptocompare_news_parse_json(appdata_s *ad, MemoryStruct *data,
     CoinNews *news_s = malloc(sizeof(CoinNews));
     news_s->news_arr = news_arr;
     news_s->size = arr_size;
-    eina_lock_take(&ad->coin_news_mutex);
+    lock_take(&ad->coin_news_mutex);
     bundle_add_byte(ad->coin_news, coin, news_s, sizeof(*news_s));
     // Load data from array members
     json_array_foreach_element(data_array, api_cryptocompare_news_parse_json_array_cb, news_arr);
-    eina_lock_release(&ad->coin_news_mutex);
+    lock_release(&ad->coin_news_mutex);
     // Cleanup
     g_error_free(err);
     g_object_unref(json_parser);
@@ -55,9 +55,9 @@ static void api_cryptocompare_news_thread_cb(void *data, Ecore_Thread *thread)
     // Check for existing news data
     CoinNewsData *news_s;
     size_t size;
-    eina_lock_take(&ad->coin_news_mutex);
+    lock_take(&ad->coin_news_mutex);
     int ret = bundle_get_byte(ad->coin_news, coin, (void **)&news_s, &size);
-    eina_lock_release(&ad->coin_news_mutex);
+    lock_release(&ad->coin_news_mutex);
     // Skip downloading data if already exists
     if (ret == BUNDLE_ERROR_NONE)
         return;
@@ -98,7 +98,7 @@ static void api_cryptocompare_full_obj_cb(JsonObject *object, const gchar *membe
     // Add price to global bundle for later use to reduce api calls
     CoinPriceData *price_data;
     size_t size;
-    eina_lock_take(&ad->coin_price_data_mutex);
+    lock_take(&ad->coin_price_data_mutex);
     int ret = bundle_get_byte(ad->coin_price_data, member_name, (void **)&price_data, &size);
     // Create new struct if doesn't exist
     if (ret != BUNDLE_ERROR_NONE)
@@ -118,15 +118,15 @@ static void api_cryptocompare_full_obj_cb(JsonObject *object, const gchar *membe
     CoinData *bal_data = NULL;
     bundle_get_byte(coin_data, member_name, (void **)&bal_data, &size);
     bal_data->d_balance = bal_data->c_balance * price_data->price;
-    eina_lock_release(&ad->coin_price_data_mutex);
+    lock_release(&ad->coin_price_data_mutex);
     // Update icon url
-    eina_lock_take(&ad->icon_urls_mutex);
+    lock_take(&ad->icon_urls_mutex);
     char *str;
     const char *img_url = json_object_get_string_member(data, "IMAGEURL");
     ret = bundle_get_str(ad->icon_urls, member_name, &str);
     if (ret != BUNDLE_ERROR_NONE)
         bundle_add_str(ad->icon_urls, member_name, img_url);
-    eina_lock_release(&ad->icon_urls_mutex);
+    lock_release(&ad->icon_urls_mutex);
 }
 
 static void api_cryptocompare_full_parse_json(appdata_s *ad, MemoryStruct *data, bundle *coin_data)

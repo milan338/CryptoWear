@@ -20,13 +20,13 @@ void view_data_volume(int i)
     // Get coin data
     CoinPriceData *price_data;
     size_t size;
-    eina_lock_take(&ad->coin_price_data_mutex);
+    lock_take(&ad->coin_price_data_mutex);
     bundle_get_byte(ad->coin_price_data, symbol, (void **)&price_data, &size);
     double high = price_data->high;
     double low = price_data->low;
     double open = price_data->open;
     double volume = price_data->volume;
-    eina_lock_release(&ad->coin_price_data_mutex);
+    lock_release(&ad->coin_price_data_mutex);
     char *line;
     // Draw open price
     cairo_image_draw_double(&extents,

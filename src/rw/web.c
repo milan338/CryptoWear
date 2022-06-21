@@ -67,14 +67,26 @@ MemoryStruct *web_request_write_memory(char *url, char *post_data, struct curl_s
             web_request_curl_easy_setopts(curl_handler, url, post_data, http_headers, request_type);
             curl_easy_setopt(curl_handler, CURLOPT_WRITEFUNCTION, write_memory_callback);
             curl_easy_setopt(curl_handler, CURLOPT_WRITEDATA, (void *)chunk);
-            // Send request
-            CURLcode curl_err;
-            curl_err = curl_easy_perform(curl_handler);
-            if (curl_err != CURLE_OK)
+            int n_retries = 0;
+            while (n_retries <= MAX_RETRIES_MEM)
             {
                 free(chunk->memory);
                 free(chunk);
-                chunk = NULL;
+                chunk = malloc(sizeof(MemoryStruct));
+                chunk->memory = malloc(1);
+                chunk->size = 0;
+                // Send request
+                CURLcode curl_err = curl_easy_perform(curl_handler);
+                if (curl_err != CURLE_OK)
+                {
+                    // Not retrying anymore
+                    if (n_retries == MAX_RETRIES_MEM)
+                        break;
+                    sleep(WAIT_RETRY_MEM_S);
+                    n_retries++;
+                }
+                else
+                    break;
             }
         }
         destroy_existing_connection();
@@ -100,13 +112,28 @@ int web_request_write_file(char *url, char *post_data, struct curl_slist *http_h
             // Init curl handler
             web_request_curl_easy_setopts(curl_handler, url, post_data, http_headers, request_type);
             curl_easy_setopt(curl_handler, CURLOPT_WRITEDATA, fp);
-            // Send request
-            curl_err = curl_easy_perform(curl_handler);
+            int n_retries = 0;
+            while (n_retries <= MAX_RETRIES_FILE)
+            {
+                // Send request
+                curl_err = curl_easy_perform(curl_handler);
+                if (curl_err != CURLE_OK)
+                {
+                    // Not retrying anymore - cleanup
+                    if (n_retries == MAX_RETRIES_FILE)
+                    {
+                        remove(file_path);
+                        break;
+                    }
+                    usleep(WAIT_RETRY_FILE_US);
+                    freopen(NULL, "wb", fp);
+                    n_retries++;
+                }
+                else
+                    break;
+            }
             // Finish file operations
             fclose(fp);
-            // Remove file if error encountered
-            if (curl_err != CURLE_OK)
-                remove(file_path);
         }
         destroy_existing_connection();
     }

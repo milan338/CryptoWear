@@ -4,6 +4,11 @@
 #include <curl/curl.h>
 #include "main.h"
 
+#define MAX_RETRIES_MEM 5
+#define WAIT_RETRY_MEM_S 1
+#define MAX_RETRIES_FILE 10
+#define WAIT_RETRY_FILE_US 100000
+
 typedef struct MemoryStruct
 {
     char *memory;

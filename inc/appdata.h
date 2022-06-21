@@ -49,6 +49,7 @@ typedef struct appdata
     cairo_surface_t *cairo_surface;
     CoinData *coin_data;
     size_t coin_data_size;
+    void *crypto_names_data;
     bundle *crypto_names;
     bundle *exchange_data;
     bundle *fiat_data;

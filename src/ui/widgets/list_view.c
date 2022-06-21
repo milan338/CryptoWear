@@ -86,6 +86,7 @@ static char *item_crypto_get_text(void *data, Evas_Object *obj, const char *part
     }
     else
         return NULL;
+    return NULL;
 }
 
 // Get text for fiat currency item

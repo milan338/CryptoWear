@@ -1,10 +1,14 @@
 #include <bundle.h>
+#include <json-glib/json-glib.h>
 #include "main.h"
 #include "../ui/widgets/popup_view.h"
+#include "../rw/json.h"
 #include "api_base.h"
 #include "api_data.h"
 
 int array_iter_index;
+JsonParser *json_parser = NULL;
+JsonObject *coin_names = NULL;
 
 // Callback function to free data from a CoinData struct from an Eina_Array
 Eina_Bool coin_data_cleanup_cb(const void *container, void *data, void *fdata)
@@ -69,10 +73,29 @@ void coin_news_bundle_cleanup_cb(const char *key, const int type, bundle_keyval_
     // Don't free parent struct - should be freed by bundle
 }
 
+void free_coin_data_json_parser()
+{
+    if (json_parser != NULL)
+        g_object_unref(json_parser);
+}
+
 // Copy contents from CoinData struct in Eina_Array to CoinData array
 // Reset array_iter_index to 0 before execution
 Eina_Bool coin_data_copy_cb(const void *container, void *data, void *fdata)
 {
+    appdata_s *ad = get_appdata(NULL);
+    // Create new json parser that lasts app lifetime
+    if (json_parser == NULL && ad->crypto_names_data != NULL)
+    {
+        json_parser = json_parse_new_parser();
+        GError *err = NULL;
+        json_load_data(json_parser, ad->crypto_names_data, JSON_DATA_TYPE_MEMORY, err);
+        JsonNode *json_root = json_parser_get_root(json_parser);
+        JsonObject *root_obj = json_node_get_object(json_root);
+        coin_names = json_object_get_object_member(root_obj, "Data");
+        // Cleanup - g_object_unref called in main at app cleanup
+        g_error_free(err);
+    }
     CoinData *in_data = data;
     CoinData *out_data = fdata;
     // Copy data
@@ -83,6 +106,27 @@ Eina_Bool coin_data_copy_cb(const void *container, void *data, void *fdata)
     out_data[array_iter_index].symbol = in_data->symbol;
     // Download icon for image if it isn't already cached
     download_crypto_icon(out_data[array_iter_index].symbol);
+    // Get coin name from json
+    if (coin_names != NULL)
+    {
+        JsonObject *coin_object = json_object_get_object_member(coin_names, in_data->symbol);
+        // const char *symbol = json_object_get_string_member(coin_names, "Symbol");
+        const char *full_name = json_object_get_string_member(coin_object, "FullName");
+        // full_name in format "Coin Name (SYMBOL)", so need to remove symbol
+        int symbol_len = 1;
+        for (int i = strlen(full_name) - 1; i >= 0; i--)
+        {
+            if (full_name[i] == '(')
+                break;
+            symbol_len++;
+        }
+        char *name = strndup(full_name, strlen(full_name) - symbol_len);
+        lock_take(&ad->coin_list_mutex);
+        bundle_add_str(ad->crypto_names, in_data->symbol, name);
+        lock_release(&ad->coin_list_mutex);
+        // Cleanup
+        free(name);
+    }
     // Copy next data
     array_iter_index++;
     return EINA_TRUE;

@@ -8,7 +8,7 @@
 #include "sap/accessory.h"
 #include "api/api_data.h"
 #include "api/fiat/api_fiat.h"
-#include "api/coingecko/api_coingecko.h"
+#include "api/cryptocompare/api_cryptocompare.h"
 #include "ui/widgets/list_view.h"
 #include "ui/views/view_home.h"
 
@@ -46,6 +46,7 @@ appdata_s *get_appdata(appdata_s *ad)
         return NULL;
     }
 }
+
 static void create_base_gui(appdata_s *ad)
 {
     // Set static appdata pointer
@@ -118,7 +119,8 @@ static bool app_create(void *data)
     ad->icon_urls = bundle_create();
     // Get crypto full names
     ad->crypto_names = NULL;
-    ecore_thread_run(api_coingecko_coin_list_thread_cb, NULL, NULL, ad);
+    ad->crypto_names_data = NULL;
+    ecore_thread_run(api_cryptocompare_coinlist_thread_cb, NULL, NULL, ad);
     // Get fiat data
     ecore_thread_run(api_fiat_thread_cb, NULL, NULL, ad);
     // Substitute local icons for online icons
@@ -173,6 +175,9 @@ static void app_terminate(void *data)
     bundle_free(ad->file_status);
     bundle_free(ad->coin_price_data);
     bundle_free(ad->icon_urls);
+    free_coin_data_json_parser();
+    if (ad->crypto_names_data != NULL)
+        web_request_cleanup(ad->crypto_names_data);
     // Release webview resources
     ewk_shutdown();
     // Release app resource manager resources

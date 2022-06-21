@@ -6,6 +6,21 @@
 #include "../../rw/json.h"
 #include "api_cryptocompare.h"
 
+// Get all coin names
+void api_cryptocompare_coinlist_thread_cb(void *data, Ecore_Thread *thread)
+{
+    appdata_s *ad = get_appdata(NULL);
+    lock_take(&ad->coin_list_mutex);
+    // Init bundle for storing json data
+    if (ad->crypto_names != NULL)
+        bundle_free(ad->crypto_names);
+    ad->crypto_names = bundle_create();
+    lock_release(&ad->coin_list_mutex);
+    // Send api request
+    MemoryStruct *chunk = web_request_write_memory(API_CRYPTOCOMPARE_COINLIST, NULL, NULL, REQUEST_TYPE_GET);
+    g_atomic_pointer_set(&ad->crypto_names_data, chunk);
+}
+
 static void api_cryptocompare_news_parse_json_array_cb(JsonArray *array, guint index, JsonNode *member_node, gpointer user_data)
 {
     CoinNewsData **news_arr = (CoinNewsData **)user_data;

@@ -9,6 +9,8 @@ void exchange_data_bundle_cleanup_cb(const char *key, const int type, bundle_key
 void fiat_data_bundle_cleanup_cb(const char *key, const int type, bundle_keyval_t *kv, void *user_data);
 void coin_news_bundle_cleanup_cb(const char *key, const int type, bundle_keyval_t *kv, void *user_data);
 
+void free_coin_data_json_parser();
+
 extern int array_iter_index;
 Eina_Bool coin_data_copy_cb(const void *container, void *data, void *fdata);
 

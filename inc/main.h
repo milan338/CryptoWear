@@ -1,7 +1,9 @@
 #ifndef __cryptowear_H__
 #define __cryptowear_H__
 
+#ifdef _WIN32
 #undef _WIN32
+#endif
 
 #include <app.h>
 #include <Elementary.h>

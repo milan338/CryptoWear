@@ -3,6 +3,8 @@
 
 #include "main.h"
 
+#define MAX_REFRESHES 3
+
 void view_balances(appdata_s *ad);
 
 #endif // VIEWBALANCES_H

@@ -85,6 +85,12 @@ static void create_base_gui(appdata_s *ad)
     create_genlist_item_classes(ad);
     // Show main menu
     view_home(ad);
+    // Get crypto full names
+    ad->crypto_names = NULL;
+    ad->crypto_names_data = NULL;
+    ecore_thread_run(api_cryptocompare_coinlist_thread_cb, NULL, NULL, ad);
+    // Get fiat data
+    ecore_thread_run(api_fiat_thread_cb, NULL, NULL, ad);
 }
 
 // Hook before main event loop starts
@@ -117,12 +123,6 @@ static bool app_create(void *data)
     ad->coin_price_data = bundle_create();
     ad->coin_news = bundle_create();
     ad->icon_urls = bundle_create();
-    // Get crypto full names
-    ad->crypto_names = NULL;
-    ad->crypto_names_data = NULL;
-    ecore_thread_run(api_cryptocompare_coinlist_thread_cb, NULL, NULL, ad);
-    // Get fiat data
-    ecore_thread_run(api_fiat_thread_cb, NULL, NULL, ad);
     // Substitute local icons for online icons
     for (int i = 0; i < local_icons_size; i++)
         bundle_add_str(ad->icon_urls, local_icons[i].coin, local_icons[i].path);

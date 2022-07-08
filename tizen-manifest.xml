@@ -8,7 +8,7 @@
         <metadata key="master_app_name" value="Cryptowear Companion" />
         <metadata key="master_app_packagename" value="com.milan338.cryptowearcompanion" />
         <metadata key="master_app_samsungapps_deeplink" value="samsungapps://ProductDetail/com.milan338.cryptowearcompanion" />
-        <metadata key="master_app_playstore_deeplink" value=" market://details?id=com.milan338.cryptowearcompanion" />
+        <metadata key="master_app_playstore_deeplink" value="market://details?id=com.milan338.cryptowearcompanion" />
         <metadata key="master_app_auto_uninstallation" value="yes" />
     </ui-application>
     <privileges>

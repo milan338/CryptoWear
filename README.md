@@ -1,11 +1,11 @@
 # CryptoWear
 
+### ***Your crypto portfolio from the comfort of your wrist***
+
 ![issues](https://img.shields.io/github/issues/milan338/CryptoWear?style=flat-square)
-![Release](https://img.shields.io/github/v/release/milan338/CryptoWear?include_prereleases&style=flat-square)
-![Downloads](https://img.shields.io/github/downloads/milan338/CryptoWear/total?style=flat-square)
 ![size](https://img.shields.io/github/repo-size/milan338/CryptoWear?style=flat-square)
 
-### ***Your crypto portfolio from the comfort of your wrist***
+<a href="https://galaxy.store/crypwear" target="_blank" rel="noopener"><img src="https://seller.samsungapps.com/images/badges/galaxyStore/png_big/GalaxyStore_EnglishEU.png" alt="galaxystore" width="200" /></a>
 
 ## Features
 

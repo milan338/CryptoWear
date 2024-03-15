@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">CryptoWear Companion</string>
+    <string name="settings_helper_text"><![CDATA[Sync keys under settings on your wearable for changes to take effect.]]></string>
 </resources>

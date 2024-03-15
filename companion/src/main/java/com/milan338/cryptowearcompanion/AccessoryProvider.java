@@ -1,12 +1,10 @@
 package com.milan338.cryptowearcompanion;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.Signature;
-import android.widget.Toast;
-
-import androidx.appcompat.app.AlertDialog;
 
 import com.samsung.android.sdk.SsdkUnsupportedException;
 import com.samsung.android.sdk.accessory.*;
@@ -26,7 +24,6 @@ public class AccessoryProvider extends SAAgentV2 {
     private int maxDataSize = 0;
     private ServiceConnection mConnectionHandler = null;
     private Context mContext;
-    private MainActivity ui;
 
     public AccessoryProvider(Context context) {
         super(AGENT_NAME, context, SOCKET_CLASS);
@@ -44,9 +41,7 @@ public class AccessoryProvider extends SAAgentV2 {
 
     @Override
     protected void onServiceConnectionRequested(SAPeerAgent peerAgent) {
-        if (peerAgent != null)
-            // Begin authentication with peer agent
-            authenticatePeerAgent(peerAgent);
+        if (peerAgent != null) authenticatePeerAgent(peerAgent);
     }
 
     @Override
@@ -54,38 +49,23 @@ public class AccessoryProvider extends SAAgentV2 {
         if (authToken.getAuthenticationType() == SAAuthenticationToken.AUTHENTICATION_TYPE_CERTIFICATE_X509) {
             mContext = getApplicationContext();
             byte[] appKey = getApplicationCertificate(mContext);
-            // Ensure received token exists
-            if (authToken.getKey() != null) {
-                // Do token and app key match
-                boolean matched = true;
-                // Token and app key differ in length - do not match
-                if (authToken.getKey().length != appKey.length){
-                    matched = false;
-                }
-                else {
-                    // Check all token bytes
-                    for (int i = 0; i < authToken.getKey().length; i++) {
-                        // Check for a differing byte - do not match if differing
-                        if (authToken.getKey()[i] != appKey[i])
-                            matched = false;
-                    }
-                }
-                // Accept connection request if token and app key match
-                if (matched)
-                    acceptServiceConnectionRequest(peerAgent);
+
+            if (authToken.getKey() == null || authToken.getKey().length != appKey.length) return;
+
+            for (int i = 0; i < authToken.getKey().length; i++) {
+                if (authToken.getKey()[i] != appKey[i]) return;
             }
+
+            // Token lengths and bytes match, so accept the connection request
+            acceptServiceConnectionRequest(peerAgent);
         }
     }
 
     @Override
     protected void onServiceConnectionResponse(SAPeerAgent peerAgent, SASocket socket, int result) {
-        if (result == CONNECTION_SUCCESS) {
-            if (socket != null) {
-                mConnectionHandler = (ServiceConnection) socket;
-                // Get max allowed data size from peer
-                maxDataSize = peerAgent.getMaxAllowedDataSize();
-            }
-        }
+        if (socket == null || result != CONNECTION_SUCCESS) return;
+        mConnectionHandler = (ServiceConnection) socket;
+        maxDataSize = peerAgent.getMaxAllowedDataSize();
     }
 
     @Override
@@ -94,62 +74,68 @@ public class AccessoryProvider extends SAAgentV2 {
     }
 
     private static byte[] getApplicationCertificate(Context context) {
-        if (context == null)
-            return null;
-        byte[] cert = null;
-        String packageName = context.getPackageName();
+        if (context == null)  return null;
+
         try {
-            PackageInfo pkgInfo = context.getPackageManager().getPackageInfo(packageName, PackageManager.GET_SIGNATURES);
-            if (pkgInfo == null)
-                return null;
-            Signature[] sigs = pkgInfo.signatures;
-            if (sigs != null) {
-                // Get app certificate
-                CertificateFactory cf = CertificateFactory.getInstance("X.509");
-                ByteArrayInputStream bis = new ByteArrayInputStream(sigs[0].toByteArray());
-                X509Certificate x509cert = (X509Certificate)cf.generateCertificate(bis);
-                cert = x509cert.getPublicKey().getEncoded();
-            }
+            PackageInfo pkgInfo = context
+                .getPackageManager()
+                .getPackageInfo(context.getPackageName(), PackageManager.GET_SIGNATURES);
+            if (pkgInfo == null)  return null;
+
+            Signature[] signatures = pkgInfo.signatures;
+            if (signatures == null) return null;
+
+            CertificateFactory certFactory = CertificateFactory.getInstance("X.509");
+            ByteArrayInputStream bis = new ByteArrayInputStream(signatures[0].toByteArray());
+            X509Certificate x509cert = (X509Certificate)certFactory.generateCertificate(bis);
+            return x509cert.getPublicKey().getEncoded();
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
         } catch (CertificateException e) {
             e.printStackTrace();
         }
-        return cert;
+
+        return null;
     }
 
     // Securely send data to peer
     public void secureSendData(final String data) {
-        // Ensure connection is valid, and data is valid and fits in max data size
-        if (data != null && mConnectionHandler != null && data.getBytes().length < maxDataSize) {
-            final ServiceConnection handler = mConnectionHandler;
-            new Thread(() -> {
-                try {
-                    byte[] bytes = data.getBytes();
-                    // Securely send data to peer
-                    handler.secureSend(getServiceChannelId(0), bytes);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }).start();
-        }
+        if (data == null || mConnectionHandler == null || data.getBytes().length >= maxDataSize)
+            return;
+
+        final ServiceConnection handler = mConnectionHandler;
+        new Thread(() -> {
+            try {
+                handler.secureSend(getServiceChannelId(0), data.getBytes());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }).start();
     }
 
     private void processUnsupportedException(SsdkUnsupportedException e) {
         e.printStackTrace();
-        int errType = e.getType();
-        switch(errType) {
+
+        String message = "";
+        switch(e.getType()) {
             case(SsdkUnsupportedException.VENDOR_NOT_SUPPORTED):
             case(SsdkUnsupportedException.DEVICE_NOT_SUPPORTED):
                 releaseAgent();
-                return;
+                message = "Device not supported";
+                break;
             case(SsdkUnsupportedException.LIBRARY_NOT_INSTALLED):
+                message = "Samsung SAP library is not installed";
+                break;
             case(SsdkUnsupportedException.LIBRARY_UPDATE_IS_RECOMMENDED):
             case(SsdkUnsupportedException.LIBRARY_UPDATE_IS_REQUIRED):
-                return;
-            default:
+                message = "Samsung SAP library is out-of-date";
                 break;
         }
+
+        Intent errorIntent = new Intent(mContext, ErrorDialogActivity.class);
+        errorIntent.putExtra("title", "Error");
+        errorIntent.putExtra("message", message);
+        mContext.startActivity(errorIntent);
     }
 
     public class ServiceConnection extends SASocket {
@@ -165,12 +151,10 @@ public class AccessoryProvider extends SAAgentV2 {
             if (mConnectionHandler == null)
                 return;
             String msg = new String(data);
-            // Convert received string to JSON
             try {
                  JSONObject obj = new JSONObject(msg);
                  String requestType = obj.getString("requestType");
-                 if (requestType.equals("getKeys"))
-                     updateKeys();
+                 if (requestType.equals("getKeys")) updateKeys();
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -182,12 +166,8 @@ public class AccessoryProvider extends SAAgentV2 {
         }
 
         private void updateKeys() {
-            // Get JSON of all fields
-            JSONObject obj = MainActivity.getKeys();
-            // Convert JSON to string
-            String data = obj.toString();
-            // Send data to peer
-            secureSendData(data);
+            JSONObject keys = MainActivity.getKeys();
+            secureSendData(keys.toString());
         }
     }
 }

@@ -29,7 +29,7 @@ public class MainActivity extends AppCompatActivity {
         keyStore = getPreferences(MODE_PRIVATE);
         // Get main vertical layout
         LinearLayout layout = findViewById(R.id.layout_main);
-        // Elements to add - UI string, key ID, secret ID
+        // Elements to add as { UI string, key ID, secret ID }
         String[][] key_data = {
                 {"Coinbase", "coinbase_key", "coinbase_secret"},
                 {"CoinSpot", "coinspot_key", "coinspot_secret"}
@@ -46,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
         }
         // Add helper text
         TextView tv = new TextView(this);
-        tv.setText("Go to settings -> sync keys on your wearable once finished");
+        tv.setText(R.string.settings_helper_text);
         layout.addView(tv);
         // Add button listener
         Button updateBtn = findViewById(R.id.save_btn);
@@ -60,9 +60,7 @@ public class MainActivity extends AppCompatActivity {
 
     protected void addInput(String hint, String key, LinearLayout layout) {
         EditText input = new EditText(this);
-        // Set input type to password to hide the entered keys
         input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-        // Update map with new data whenever keys are entered
         input.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
@@ -76,27 +74,21 @@ public class MainActivity extends AppCompatActivity {
                 keys.put(key, userInput);
             }
         });
-        // Set text hint
         input.setHint(hint);
-        // Add input to scroll view
         layout.addView(input);
-        // Add existing stored key data
         String keyValue = keyStore.getString(key, null);
-        if (keyValue != null)
-            input.setText(keyValue);
-        else
-            input.setText("");
+        if (keyValue != null)  input.setText(keyValue);
+        else input.setText("");
     }
 
     public static JSONObject getKeys() {
-        JSONObject obj = new JSONObject();
+        JSONObject res = new JSONObject();
         try {
-            // Iterate through map and update all fields
             for (Map.Entry<String, String> entry : keys.entrySet())
-                obj.put(entry.getKey(), entry.getValue());
+                res.put(entry.getKey(), entry.getValue());
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        return obj;
+        return res;
     }
 }
